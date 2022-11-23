@@ -3,7 +3,7 @@ vanilla_model.HELD_ITEMS:setVisible(true)
 
 --pony stuff
 Magic = true
-Wings = true
+Wings = false
 
 Timer = require "TimerAPI"
 GNA = require "GNanim"
