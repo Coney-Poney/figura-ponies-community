@@ -5,11 +5,38 @@ local rot = vec(0,0,0)
 local lrot = vec(0,0,0)
 local landVel = 0
 local hand = false
+local rightItem
+local leftItem
 local rightSwing = false
 local leftSwing = false
 local wingTexture = false
 
-events.TICK:register(function() -- Animations
+-- Pony Stuff
+function magicAura() -- Detects when holding something
+    if player:getActiveItem().id == ("minecraft:bow" or "minecraft:crossbow") then
+        models.pony.LeftArm:setVisible(true)
+        models.pony.RightArm:setVisible(true)
+    else
+        if leftItem.id ~= "minecraft:air" or leftSwing then
+            models.pony.LeftArm:setVisible(true)
+        else
+            models.pony.LeftArm:setVisible(false)
+        end
+        if rightItem.id ~= "minecraft:air" or rightSwing then
+            models.pony.RightArm:setVisible(true)
+        else
+            models.pony.RightArm:setVisible(false)
+        end
+    end
+    if models.pony.RightArm.RightArm:getVisible() or models.pony.LeftArm.LeftArm:getVisible() then
+        models.pony.Root.body.neck.head.horn_glow:setVisible(true)
+    else
+        models.pony.Root.body.neck.head.horn_glow:setVisible(false)
+    end 
+end
+
+-- Animations
+events.TICK:register(function() 
     lrot = rot
     rot = vanilla_model.HEAD:getOriginRot()
     vel = player:getVelocity()
@@ -31,10 +58,10 @@ events.TICK:register(function() -- Animations
     local leftHand = not hand and "OFF_HAND" or "MAIN_HAND"
     local active = player:getActiveHand()
     local using = player:isUsingItem()
-    rightSwing = player:getSwingArm() == rightHand and pose ~= "SLEEPING" and not Magic
-    leftSwing = player:getSwingArm() == leftHand and pose ~= "SLEEPING" and not Magic
-    local rightItem = player:getHeldItem(hand)
-    local leftItem = player:getHeldItem(not hand)
+    rightSwing = player:getSwingArm() == rightHand and pose ~= "SLEEPING"
+    leftSwing = player:getSwingArm() == leftHand and pose ~= "SLEEPING"
+    rightItem = player:getHeldItem(hand)
+    leftItem = player:getHeldItem(not hand)
     local usingR = active == rightHand and rightItem:getUseAction()
     local usingL = active == leftHand and leftItem:getUseAction()
 
@@ -75,8 +102,8 @@ events.TICK:register(function() -- Animations
     animations.pony.loadingL:setPlaying(loadingL)
     animations.pony.crossR:setPlaying(crossR)
     animations.pony.crossL:setPlaying(crossL)
-    animations.pony.swingR:setPlaying(rightSwing)
-    animations.pony.swingL:setPlaying(leftSwing)
+    animations.pony.swingR:setPlaying(rightSwing and not Magic)
+    animations.pony.swingL:setPlaying(leftSwing and not Magic)
 
     if rightItem.id ~= "minecraft:air" and freearm and not Magic then
         models.pony.Root.right_front_leg:offsetRot(15,0,0)
@@ -93,7 +120,7 @@ events.TICK:register(function() -- Animations
         landVel = math.clamp(math.map(vel.y, 0, -1, 0, 1.25),0,2)
     end
 
-    if player:isOnGround() and pose ~= "SWIMMING" and (pose == "STANDING" or pose == "CROUCHING") and not vehicle then
+    if player:isOnGround() and not movingstate then
         animations.pony.jumpup:stop()
         animations.pony.jumpdown:stop()
         if animations.pony.fall:getPlayState() == "PLAYING" then
@@ -125,7 +152,10 @@ events.TICK:register(function() -- Animations
         end
     end
 
+    animations.pony.Yee_Haw:setPlaying(emote == 1)
+    animations.pony.dance:setPlaying(emote == 3)
     animations.pony.sit:setPlaying(vehicle or emote == 2)
+
     animations.pony.crouch:setPlaying(pose == 'CROUCHING' and not player:isClimbing())
     animations.pony.walk:speed(localVel.y * 17.5)
     animations.pony.sprint:speed(localVel.y * 17.5)
@@ -144,11 +174,39 @@ events.TICK:register(function() -- Animations
     animations.pony.sleeping:setPlaying(pose == "SLEEPING")
     animations.pony.Dying:setPlaying((player:getHealth() + player:getNbt().AbsorptionAmount) == 0)
 
-    animations.pony.Yee_Haw:setPlaying(emote == 1)
-    animations.pony.dance:setPlaying(emote == 3)
+    if Magic then
+        magicAura()
+        models.pony.Root.right_front_leg.RIGHT_ITEM_PIVOT:setVisible(false)
+        models.pony.Root.left_front_leg.LEFT_ITEM_PIVOT:setVisible(false)
+    else
+        models.pony.RightArm:setVisible(false)
+        models.pony.LeftArm:setVisible(false)
+        models.pony.Root.right_front_leg.RIGHT_ITEM_PIVOT:setVisible(true)
+        models.pony.Root.left_front_leg.LEFT_ITEM_PIVOT:setVisible(true)
+    end
+
+    if Wings then
+        models.pony.Root.body.left_wing:setVisible(true)
+        models.pony.Root.body.right_wing:setVisible(true)
+        models.pony.Root.body.left_wing:setUVPixels(0, 0)
+        models.pony.Root.body.right_wing:setUVPixels(0, 0)
+    else
+        models.pony.Root.body.left_wing:setUVPixels(0, 14)
+        models.pony.Root.body.right_wing:setUVPixels(0, 14)
+        if player:getItem(5).id == "minecraft:elytra" then
+            wingTexture = true
+            models.pony.Root.body.left_wing:setVisible(true)
+            models.pony.Root.body.right_wing:setVisible(true)
+        else
+            wingTexture = false
+            models.pony.Root.body.left_wing:setVisible(false)
+            models.pony.Root.body.right_wing:setVisible(false)
+        end
+    end
 end)
 
-events.RENDER:register(function (t) -- Arm and Head movement
+-- Arm and Head movement
+events.RENDER:register(function (t)
     local r = vec(math.lerp(lrot.x, rot.x, t), math.lerp(lrot.y, rot.y, t), math.lerp(lrot.z, rot.z, t))
     if player then
         if pose == "SWIMMING" or pose == "FALL_FLYING" or pose == "SPIN_ATTACK" then
@@ -208,81 +266,3 @@ animations.pony.crawl:blendTime(0)
 animations.pony.swim:blendTime(0)
 animations.pony.flying:blendTime(3)
 animations.pony.flyingdown:blendTime(3)
-
-
--- Pony Stuff
-function magicAura() -- Detects when holding something
-    if player:getActiveItem().id == ("minecraft:bow" or "minecraft:crossbow") then
-        models.pony.LeftArm:setVisible(true)
-        models.pony.RightArm:setVisible(true)
-    else
-        if player:isLeftHanded() then
-            if player:getHeldItem().id ~= "minecraft:air" or leftSwing then
-                models.pony.LeftArm:setVisible(true)
-            else
-                models.pony.LeftArm:setVisible(false)
-            end
-            if player:getHeldItem(true).id ~= "minecraft:air" then
-                models.pony.RightArm:setVisible(true)
-            else
-                models.pony.RightArm:setVisible(false)
-            end
-        else
-            if player:getHeldItem(true).id ~= "minecraft:air" then
-                models.pony.LeftArm:setVisible(true)
-            else
-                models.pony.LeftArm:setVisible(false)
-            end
-            if player:getHeldItem().id ~= "minecraft:air" or rightSwing then
-                models.pony.RightArm:setVisible(true)
-            else
-                models.pony.RightArm:setVisible(false)
-            end
-        end
-    end
-    if models.pony.RightArm.RightArm:getVisible() or models.pony.LeftArm.LeftArm:getVisible() then
-        models.pony.Root.body.neck.head.horn_glow:setVisible(true)
-    else
-        models.pony.Root.body.neck.head.horn_glow:setVisible(false)
-    end 
-end
-
-events.TICK:register(function ()
-    if player then
-        if Magic then
-            magicAura()
-            models.pony.Root.right_front_leg.RIGHT_ITEM_PIVOT:setVisible(false)
-            models.pony.Root.left_front_leg.LEFT_ITEM_PIVOT:setVisible(false)
-        else
-            models.pony.RightArm:setVisible(false)
-            models.pony.LeftArm:setVisible(false)
-            models.pony.Root.right_front_leg.RIGHT_ITEM_PIVOT:setVisible(true)
-            models.pony.Root.left_front_leg.LEFT_ITEM_PIVOT:setVisible(true)
-        end
-
-        if Wings then
-            models.pony.Root.body.left_wing:setVisible(true)
-            models.pony.Root.body.right_wing:setVisible(true)
-            models.pony.Root.body.left_wing:setUVPixels(0, 0)
-            models.pony.Root.body.right_wing:setUVPixels(0, 0)
-        else
-            models.pony.Root.body.left_wing:setUVPixels(0, 14)
-            models.pony.Root.body.right_wing:setUVPixels(0, 14)
-            if player:getItem(5).id ~= "minecraft.air" and player:getItem(5).id == "minecraft:elytra" then
-                wingTexture = true
-                models.pony.Root.body.left_wing:setVisible(true)
-                models.pony.Root.body.right_wing:setVisible(true)
-            else
-                wingTexture = false
-                models.pony.Root.body.left_wing:setVisible(false)
-                models.pony.Root.body.right_wing:setVisible(false)
-            end
-        end
-    end
-end)
-
-
---[[blarg = keybinds:newKeybind("blarg", "key.keyboard.x")
-blarg.onPress =  function()
-    print()
-end]]--
