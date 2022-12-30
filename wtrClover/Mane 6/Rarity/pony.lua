@@ -1,14 +1,12 @@
 vanilla_model.ALL:setVisible(false)
 vanilla_model.HELD_ITEMS:setVisible(true)
+vanilla_model.HELMET_ITEM:setVisible(true)
 
---pony stuff
-Magic = true
+-- pony stuff
+Magic = false
 Wings = false
 
-Timer = require "TimerAPI"
-GNA = require "GNanim"
-Evnt = require "KattEventsAPI"
-
+-- ArmorAPI
 local ArmorAPI = require("KattArmorAPI")
 
 ArmorAPI.Armor.addHelmet(models.pony.Root.body.neck.head.Helmet)
@@ -73,6 +71,8 @@ do
   end)
 end
 
-require "SM"
-Emote = require "emote"
-require "action_wheel"
+emote = 0
+
+
+require("locomotion")
+require("actionwheel")
