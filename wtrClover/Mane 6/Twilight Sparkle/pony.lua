@@ -3,7 +3,7 @@ vanilla_model.HELD_ITEMS:setVisible(true)
 vanilla_model.HELMET_ITEM:setVisible(true)
 
 -- pony stuff
-Magic = false
+Magic = true
 Wings = true
 
 -- ArmorAPI
