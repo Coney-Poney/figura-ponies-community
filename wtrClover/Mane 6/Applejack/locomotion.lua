@@ -85,6 +85,9 @@ events.TICK:register(function()
         else
             models.pony.Root.left_front_leg:offsetRot(0,0,0)
         end
+    else
+        models.pony.Root.left_front_leg:offsetRot(0,0,0)
+        models.pony.Root.right_front_leg:offsetRot(0,0,0)
     end
 
     if not player:isOnGround() then
