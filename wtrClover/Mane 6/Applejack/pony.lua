@@ -4,9 +4,19 @@ vanilla_model.HELMET_ITEM:setVisible(true)
 vanilla_model.PARROTS:setVisible(true)
 
 -- pony stuff
-Magic = false
-Wings = false
-Horn = false
+if rawequal(next(config:load()), nil) then
+	local InitValues = require("InitValues")
+	config:save("Magic", Magic)
+	config:save("Wings", Wings)
+	config:save("Horn", Horn)
+	Magic = config:load("Magic")
+	Wings = config:load("Wings")
+	Horn = config:load("Horn")
+else
+	Magic = config:load("Magic")
+	Wings = config:load("Wings")
+	Horn = config:load("Horn")
+end
 
 -- ArmorAPI
 local ArmorAPI = require("KattArmorAPI")
@@ -14,6 +24,7 @@ local KCT = require("KattArmorCustomTextures")
 local KCM = require("KattArmorCustomModel")
 
 local modelsponyRoot = models.pony.Root
+
 ArmorAPI.addHelmet(modelsponyRoot.body.neck.head.Helmet,models.pony.Root.body.neck.head.Helmet_snout)
 ArmorAPI.addChestplate(
     modelsponyRoot.body.Chestplate,
