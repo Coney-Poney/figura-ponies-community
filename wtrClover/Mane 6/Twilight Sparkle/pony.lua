@@ -14,8 +14,7 @@ local KCT = require("KattArmorCustomTextures")
 local KCM = require("KattArmorCustomModel")
 
 local modelsponyRoot = models.pony.Root
-
-ArmorAPI.addHelmet(modelsponyRoot.body.neck.head.Helmet)
+ArmorAPI.addHelmet(modelsponyRoot.body.neck.head.Helmet,models.pony.Root.body.neck.head.Helmet_snout)
 ArmorAPI.addChestplate(
     modelsponyRoot.body.Chestplate,
     modelsponyRoot.body.neck.Neckpiece
