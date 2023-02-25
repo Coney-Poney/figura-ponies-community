@@ -4,18 +4,11 @@ vanilla_model.HELMET_ITEM:setVisible(true)
 vanilla_model.PARROTS:setVisible(true)
 
 -- pony stuff
-if rawequal(next(config:load()), nil) then
-	local InitValues = require("InitValues")
-	config:save("Magic", Magic)
-	config:save("Wings", Wings)
-	config:save("Horn", Horn)
-	Magic = config:load("Magic")
-	Wings = config:load("Wings")
-	Horn = config:load("Horn")
-else
-	Magic = config:load("Magic")
-	Wings = config:load("Wings")
-	Horn = config:load("Horn")
+local initvalues = require("InitValues")
+for k,v in pairs(initvalues) do
+	if config:load(k) == nil then
+		config:save(k, v)
+	end
 end
 
 -- ArmorAPI
