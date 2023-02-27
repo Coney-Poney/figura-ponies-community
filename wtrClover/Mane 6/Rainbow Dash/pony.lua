@@ -11,6 +11,10 @@ for k,v in pairs(initvalues) do
 	end
 end
 
+Horn = config:load("Horn")
+Magic = config:load("Magic")
+Wings = config:load("Wings")
+
 -- ArmorAPI
 local ArmorAPI = require("KattArmorAPI")
 local KCT = require("KattArmorCustomTextures")
