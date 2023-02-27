@@ -1,6 +1,6 @@
 local initvalues = {
 	Magic = true,
-	Wings = true,
+	Wings = false,
 	Horn = true,
 }
 

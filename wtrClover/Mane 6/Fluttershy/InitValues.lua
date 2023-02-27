@@ -1,7 +1,7 @@
 local initvalues = {
-	Magic = true,
+	Magic = false,
 	Wings = true,
-	Horn = true,
+	Horn = false,
 }
 
 return initvalues
