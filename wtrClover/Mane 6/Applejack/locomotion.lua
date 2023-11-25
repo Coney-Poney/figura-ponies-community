@@ -80,12 +80,12 @@ events.TICK:register(function()
     end
 
     if not Magic then
-        if crossR ~= (rightItem.tag and rightItem.tag["Charged"] == 1) then
-            crossR = rightItem.tag and rightItem.tag["Charged"] == 1
+        if crossR ~= (rightItem.tag and rightItem.tag["Charged"] == 1) and not crossL or (rightItem.id == "create:potato_cannon" or rightItem.id == "create:handheld_worldshaper") then
+            crossR = (rightItem.tag and rightItem.tag["Charged"] == 1) and not crossL or (rightItem.id == "create:potato_cannon" or rightItem.id == "create:handheld_worldshaper")
             animationspony.crossR:setPlaying(crossR)
         end
-        if crossL ~= (leftItem.tag and leftItem.tag["Charged"] == 1) then
-            crossL = leftItem.tag and leftItem.tag["Charged"] == 1
+        if crossL ~= (leftItem.tag and leftItem.tag["Charged"] == 1) and not crossR or (leftItem.id == "create:potato_cannon" or leftItem.id == "create:handheld_worldshaper") then
+            crossL = (leftItem.tag and leftItem.tag["Charged"] == 1) and not crossR or (leftItem.id == "create:potato_cannon" or leftItem.id == "create:handheld_worldshaper")
             animationspony.crossL:setPlaying(crossL)
         end
 
@@ -155,7 +155,7 @@ events.TICK:register(function()
         end
     end
     
-    if not isOnGround and not isClimb and not isFlying then -- Jump Fall speed
+    if not isOnGround and not isClimb and not isFlying and not vehicle then -- Jump Fall speed
         if vel.y < 0 and vel.y > -0.375 and pose ~= "FALL_FLYING" then --0 for switching for jumping up to down
             if jump_switch ~= 0 and jump_switch == 2 then -- ONLY plays if jumpup is playing
                 jump_switch = 0
@@ -363,6 +363,10 @@ events.TICK:register(function()
         models.pony.LeftArm.LeftArm:setVisible(LeftArm_vis)
         models.pony.RightArm.RightArm:setVisible(RightArm_vis)
         modelsponyRoot.body.neck.head.horn_glow:setVisible(horn_glow_vis)
+    else
+        models.pony.LeftArm.LeftArm:setVisible(false)
+        models.pony.RightArm.RightArm:setVisible(false)
+        modelsponyRoot.body.neck.head.horn_glow:setVisible(false)
     end
 
     if not Wings then
